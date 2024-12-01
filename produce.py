@@ -23,9 +23,9 @@ def kafka_producer():
     # df_stream = pd.DataFrame(columns=["Name", "Price", "Timestamp"])
     while time.time() < t_end:
         response = requests.get(
-            "https://api.cricapi.com/v1/currentMatches?apikey=a1de8753-c1aa-430f-a383-57075927b424&offset=0")
+            "https://api.cricapi.com/v1/currentMatches?apikey=&offset=0")
         response1 = requests.get(
-            "https://api.cricapi.com/v1/match_info?apikey=a1de8753-c1aa-430f-a383-57075927b424&offset=0&id=820cfd88-3b56-4a6e-9dd8-1203051140da")
+            "https://api.cricapi.com/v1/match_info?apikey=&offset=0&id=820cfd88-3b56-4a6e-9dd8-1203051140da")
         response_obj = response.json()
         data = response_obj['data']
         data_array=[]
