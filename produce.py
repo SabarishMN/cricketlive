@@ -8,7 +8,7 @@ import time
 
 
 def kafka_producer():
-    producer = KafkaProducer(bootstrap_servers=['34.227.190.251:9136'],  # change ip and port number here
+    producer = KafkaProducer(bootstrap_servers=['34.227.190.251:9134'],  # change ip and port number here
                              value_serializer=lambda x:
                              dumps(x).encode('utf-8'))
 
@@ -23,23 +23,26 @@ def kafka_producer():
     # df_stream = pd.DataFrame(columns=["Name", "Price", "Timestamp"])
     while time.time() < t_end:
         response = requests.get(
-            "https://api.cricapi.com/v1/currentMatches?apikey=b424&offset=0")
+            "https://api.cricapi.com/v1/currentMatches?apikey=a1de8753-c1aa-430f-a383-57075927b424&offset=0")
+        response1 = requests.get(
+            "https://api.cricapi.com/v1/match_info?apikey=a1de8753-c1aa-430f-a383-57075927b424&offset=0&id=820cfd88-3b56-4a6e-9dd8-1203051140da")
         response_obj = response.json()
         data = response_obj['data']
         data_array=[]
-        i=0
         for match in data:
-            data_array[i] = {
+            data_array.append({
                 'id': match['id'],
                 'name': match['name'],
                 'venue': match['venue'],
                 'score': match['score'],
-            }
-            i = i + 1
+            })
         print(data_array)
         # print(df_stream)
-        producer.send('CricketData', value=data)  # Add topic name here
-        # time.sleep(2)
+        for i in range(0,10):
+            time.sleep(1)
+            print(i)
+            producer.send('CricketData', value=data_array)  # Add topic name here
+        time.sleep(2)
     print("done producing")
 
 
