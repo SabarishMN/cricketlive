@@ -1,28 +1,63 @@
 import streamlit as st
 import requests
 import json
+import pandas as pd
 from s3fs.core import S3FileSystem
 
 
 # Load matches from a local JSON file
 @st.cache_data
 def fetch_matches():
-    s3 = S3FileSystem()
-    # S3 bucket directory (data lake)
-    DIR = 's3://ece5984-s3-sabarishm/Cricketdata'  # Insert your S3 bucket address here. Read from the directory you created in batch ingest: Lab2/batch_ingest/
-    # Get data from S3 bucket as a pickle file
-    file_name="cricket_data.json"
-    with s3.open(f'{DIR}{file_name}', 'r') as s3_file, open(file_name, 'w') as local_file:
-        for line in s3_file:
-            local_file.write(line)
+    # s3 = S3FileSystem()
+    # # S3 bucket directory (data lake)
+    # DIR = 's3://ece5984-s3-sabarishm/Cricketdata'  # Insert your S3 bucket address here. Read from the directory you created in batch ingest: Lab2/batch_ingest/
+    # # Get data from S3 bucket as a pickle file
+    # file_name="cricket_data.json"
+    # with s3.open(f'{DIR}{file_name}', 'r') as s3_file, open(file_name, 'w') as local_file:
+    #     for line in s3_file:
+    #         local_file.write(line)
     with open("cricket_data.json", "r") as f:  # Replace with S3 fetch logic if needed
-        return json.load(f)
+        raw_data = json.load(f)
+        data_df = pd.DataFrame(raw_data[0])
+    # EDA
+    print("====================================")
+
+    # Show all columns of the dataset
+    pd.set_option('display.max_columns', None)
+
+    print("Display first 5 rows of the dataset")
+    print(data_df.head().to_string())
+    print("====================================")
+
+    print("Basic DataFrame info")
+    print(data_df.info())
+    print("====================================")
+
+    print("More detailed DataFrame info")
+    print(data_df.describe(include='all').to_string())
+    print("====================================")
+
+    print("Number of Empty values in each column:")
+    print(data_df.isnull().sum().sort_values(ascending=False))
+    print("====================================")
+
+    print("Displays the number of empty values for each column in descending order")
+    print(data_df.isnull().sum().sort_values(ascending=False))
+    print("====================================")
+
+    # Data Cleaning
+    print("Dropping rows with missing values")
+    cleaned_df = data_df.dropna()
+    print(cleaned_df.to_string())
+    print("====================================")
+    return raw_data
+
 
 
 # Second API: Fetch match details using `id`
 @st.cache_data
 def fetch_match_details(match_id):
-    url = f"https://api.cricapi.com/v1/match_info?apikey=a1de8753-c1aa-430f-a383-57075927b424&offset=0&id={match_id}"
+    url = f"https://api.cricapi.com/v1/match_info?apikey=&offset=0&id={match_id}"
     response = requests.get(url)
     if response.status_code == 200:
         return response.json()
