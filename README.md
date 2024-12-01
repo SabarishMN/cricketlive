@@ -6,7 +6,7 @@
 Run the following command to start a Docker container:  
 
 ```bash
-docker run -it <docker_image_name>
+docker run --rm -it --entrypoint bash -v /home/ubuntu/efs-mount-point/students/<pid>/root:/root -p 8080-8130:8080 -p 9092-9142:9092 --name <pid> pipeline:latest
 ```
 
 Replace `<docker_image_name>` with the appropriate Docker image you are using.  
@@ -17,6 +17,7 @@ Replace `<docker_image_name>` with the appropriate Docker image you are using.
 Place the files `dag_stream.py` and `stream_ingest.py` in the Airflow DAGs directory:  
 
 ```bash
+nano <file-name>
 cp dag_stream.py stream_ingest.py /root/airflow/dags/
 ```
 
